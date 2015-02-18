@@ -15,6 +15,7 @@ int main(int argc,char **argv)
 	Window root;
 	int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0;
     char formula[256],string[256];
+    char buttonString[16] = ["1","2","3","+","4","5","6","-","7","8","9","*","0","x","=","/"];
 	unsigned long black, white;
 	GC       gc;
     KeySym key;
@@ -76,6 +77,7 @@ int main(int argc,char **argv)
                     XDrawString(dpy,quit,gc,4,10,"Exit",4);
                     XDrawString(dpy,w,gc,491,250,"X",1);
                     XDrawString(dpy,w,gc,250,8,"Y",1);
+                    
 					break;
 			}
 		}else{
