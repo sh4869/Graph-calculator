@@ -5,17 +5,19 @@
 #include <math.h>
 
 #define BORDER 2
-#define WIDTH  500
+#define WIDTH  800
 #define HIGHT 500
 
 int main(int argc,char **argv)
 {
 	Display *dpy;
-	Window w,quit;
+	Window w,quit,input,buttons[16];
 	Window root;
-	int    screen,xPoint,yPoint;
+	int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0;
+    char formula[256],string[256];
 	unsigned long black, white;
 	GC       gc;
+    KeySym key;
 	XColor c0[2],c1[2];
 	XEvent e;
 
@@ -33,24 +35,37 @@ int main(int argc,char **argv)
 
 	w = XCreateSimpleWindow(dpy, root, 100, 100, WIDTH, HIGHT, BORDER, black, white);
 	quit = XCreateSimpleWindow(dpy,w,10,3,30,12,BORDER,black,white);
+    input = XCreateSimpleWindow(dpy,w,510,10,260,480,BORDER,black,white);
+    for(count = 0;count < 16;count++){
+        buttons[count] = XCreateSimpleWindow(dpy,w,550+tate*50,200+yoko*80,30,30,BORDER,black,white);
+        tate++;
+        if((count+1) % 4 == 0){
+           yoko++;
+           tate = 0;
+        }
+    }
+
 	gc = XCreateGC(dpy, w, 0, NULL);
 	XSelectInput(dpy,w,ButtonPressMask | ButtonReleaseMask | KeyPressMask);
 	XSelectInput(dpy,quit,ButtonPressMask);
+    XSelectInput(dpy,input,ButtonPressMask);
 
 	XMapWindow(dpy, w);
 	XMapSubwindows(dpy,w);
-	XDrawLine(dpy,w,gc,xPoint,yPoint,e.xbutton.x,e.xbutton.y);
 	while(1){
 		if(XEventsQueued(dpy,QueuedAfterReading)){
-			XNextEvent(dpy,&e);
+			//Event
+            XNextEvent(dpy,&e);
 			switch (e.type){
 				case KeyPress:
 					printf("keycode=%d \n",e.xkey.keycode);
-					if(e.xkey.keycode == 38){
-						XSetForeground(dpy,gc,c1[0].pixel);
-					}else if(e.xkey.keycode == 56){
-						XSetForeground(dpy,gc,c1[1].pixel);
-					}			
+                    if(input && XLookupString(&e,string,9,&key,NULL) == 1){
+                        formula[0] = string[0];
+                        formula[1] = '\0';
+                        XDrawString(dpy,input,gc,4+l,10,formula,strlen(formula));
+                        l += 10;
+                    }
+                    if(e.xkey.keycode == 24) return;
 					break;
 				case ButtonPress :
 					printf("x=%d y=%d button=%d \n",e.xbutton.x,e.xbutton.y,e.xbutton.button);
@@ -59,9 +74,12 @@ int main(int argc,char **argv)
                         return;
                     }
                     XDrawString(dpy,quit,gc,4,10,"Exit",4);
+                    XDrawString(dpy,w,gc,491,250,"X",1);
+                    XDrawString(dpy,w,gc,250,8,"Y",1);
 					break;
 			}
 		}else{
+            //not Event
             XDrawLine(dpy,w,gc,10,250,490,250);
             XDrawLine(dpy,w,gc,250,10,250,490);
 		}
