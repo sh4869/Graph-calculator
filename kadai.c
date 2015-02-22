@@ -15,7 +15,7 @@ int main(int argc,char **argv)
   Window root;
   int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0;
   char formula[255],string[255];
-  char buttonString[2][16] = {'1','2','3','+','4','5','6','-','7','8','9','*','0','x','=','/'};
+  char buttonString[16] = {'1','2','3','+','4','5','6','-','7','8','9','*','0','x','=','/'};
   unsigned long black, white;
   GC       gc;
   KeySym key;
@@ -65,19 +65,30 @@ int main(int argc,char **argv)
 		  XDrawString(dpy,input,gc,4+l,10,formula,strlen(formula));
 		  l += 10;
 		}
-		if(e.xkey.keycode == 24) return;
+		if(e.xkey.keycode == 24) return 0;
 		break;
 	  case ButtonPress :
 		printf("x=%d y=%d button=%d \n",e.xbutton.x,e.xbutton.y,e.xbutton.button);
 		if(e.xany.window == quit){ 
 		  printf("Exit!\n");
-		  return;
+		  return 0;
 		}
 		XDrawString(dpy,quit,gc,4,10,"Exit",4);
 		XDrawString(dpy,w,gc,491,250,"X",1);
 		XDrawString(dpy,w,gc,250,8,"Y",1);
 		XDrawLine(dpy,w,gc,10,250,490,250);
 		XDrawLine(dpy,w,gc,250,10,250,490);
+		tate = yoko = 0;
+		for(count = 0;count < 16;count++){
+		  XDrawString(dpy,buttons[count],gc,13,20,&buttonString[count],1);
+	      tate++;
+		  printf("x:%d,y:%d\n",550+(tate*50)+15,200+(yoko*80)+15);
+	      if((count+1) % 4 == 0){
+	        yoko++;
+	  		tate = 0;
+		  }
+		  printf("Draw!\n");
+	    }
 		break;
 	}
   }
