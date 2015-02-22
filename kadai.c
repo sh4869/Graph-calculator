@@ -50,6 +50,9 @@ int main(int argc,char **argv)
   XSelectInput(dpy,w,ButtonPressMask | ButtonReleaseMask | KeyPressMask);
   XSelectInput(dpy,quit,ButtonPressMask);
   XSelectInput(dpy,input,ButtonPressMask);
+  for(count = 0;count < 16;count++){
+  	XSelectInput(dpy,buttons[count],ButtonPressMask);
+  }
 
   XMapWindow(dpy, w);
   XMapSubwindows(dpy,w);
@@ -59,16 +62,24 @@ int main(int argc,char **argv)
 	switch (e.type){
 	  case KeyPress:
 		printf("keycode=%d \n",e.xkey.keycode);
-		
 		if(e.xkey.keycode == 24) return 0;
 		break;
+
 	  case ButtonPress :
 		printf("x=%d y=%d button=%d \n",e.xbutton.x,e.xbutton.y,e.xbutton.button);
 		if(e.xany.window == quit){ 
 		  printf("Exit!\n");
 		  return 0;
 		}
-
+		count = 0;
+		while(count < 16){
+		  if(e.xany.window == buttons[count]){
+		  	XDrawString(dpy,input,gc,10+l,50,&buttonString[count],1);
+		  	l += 10;
+		  }
+		  count++;
+		}
+		
 		/*----------- Basic Drawing -------------*/
 		
 		XDrawString(dpy,quit,gc,4,10,"Exit",4);
