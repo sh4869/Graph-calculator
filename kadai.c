@@ -10,16 +10,19 @@
 #define WIDTH  800
 #define HIGHT 500
 
-int cast(char *equ,int length);
+float cast(char *equ,int length);
 int main(int argc,char **argv)
 {
   Display *dpy;
   Window w,quit,input,buttons[16],draw,clear;
   Window root;
   int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0,equCount = 0,equFlag = 0,value,equLength;
+  float coef = 0;
+  int coefX,coefY;
   char formula[255],string[255];
   char buttonString[16] = {'1','2','3','+','4','5','6','-','7','8','9','*','0','x','=','/'};
   char equ[255];
+  char text[100];
   unsigned long black, white;
   GC       gc;
   KeySym key;
@@ -101,35 +104,55 @@ int main(int argc,char **argv)
 					break;
 				case 1:
 					value = cast(equ,strlen(equ));
-					printf("%d\n",cast(equ,strlen(equ)));
+					break;
+				case 2:
+					printf("Please wait I develop\n");
 					break;
 				default:
 					break;
 			}
+			l = 0;
+			equCount = 0;
+			equLength = strlen(equ);
+			memset(equ,'\0',equLength);
+			XClearWindow(dpy,input);
 			if(equFlag == 0 || equFlag == 1){
 				XDrawLine(dpy,w,gc,10,250-value,490,250-value);
-				XClearWindow(dpy,input);
 				XDrawString(dpy,input,gc,160,140,equ,strlen(equ));
-				l = 0;
-				equCount = 0;
-				equLength = strlen(equ);
-				memset(equ,'\0',equLength);
 			}
 
 		}
 		
 		while(count < 16){
 		  if(e.xany.window == buttons[count]){
-		  	XDrawString(dpy,input,gc,35+l,80,&buttonString[count],1);
-		  	l += 10;
-		  	equ[equCount] = buttonString[count];
-		  	equCount++;
-		  	if((count+1) % 4 == 0){
-		  		equFlag = 1;
+		  	if(count != 13){
+		  		XDrawString(dpy,input,gc,35+l,80,&buttonString[count],1);
+		  		l += 10;
+		  		equ[equCount] = buttonString[count];
+		  		equCount++;
+		  		if((count+1) % 4 == 0){
+		  			equFlag = 1;
+		  		}
+		 	}else{
+		  		coef = cast(equ,strlen(equ));
+		  		l = 0;
+				equCount = 0;
+				equLength = strlen(equ);
+				memset(equ,'\0',equLength);
+				XClearWindow(dpy,input);
+				sprintf(text,"%fx",coef);
+				XDrawString(dpy,input,gc,160,140,text,strlen(text));
+		  		for(count = 0;count < 480;count++){
+		  			coefX = count + 10;
+		  			coefY = -((count-240) * coef) + 250;
+		  			XDrawPoint(dpy,w,gc,coefX,coefY);
+		  			coefX = coefY = 0;
+		  		}
 		  	}
-		  }
-		  count++;
+		   }
+		   count++;
 		}
+		
 		
 		/*----------- Basic Drawing -------------*/
 		
@@ -158,9 +181,10 @@ int main(int argc,char **argv)
   }
 }
 
-int cast(char *equ,int length){
+float cast(char *equ,int length){
 	int opeFlag = 0;
-	int count = 0,valueCharCount = 0,valuesCount = 0,result = 0,ope = 0,oldOpe = 0;
+	int count = 0,valueCharCount = 0,valuesCount = 0,ope = 0,oldOpe = 0;
+	float result = 0;
 	int values[10];
 	char valuesChar[10];
 	while(count < length){
@@ -220,7 +244,6 @@ int cast(char *equ,int length){
 			}
 		}
 		if(opeFlag || count == length){
-			printf("Values Count - 1:  %d\n",values[valuesCount - 1]);
 			if(valuesCount == 1){
 				result = values[valuesCount - 1];
 			}else if(valuesCount != 0){
@@ -240,7 +263,6 @@ int cast(char *equ,int length){
 				}
 			}
 			oldOpe = ope;
-			printf("Result:%d\n",result);
 		}
 	}
 	return result;
