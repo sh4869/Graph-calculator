@@ -11,7 +11,7 @@
 int main(int argc,char **argv)
 {
   Display *dpy;
-  Window w,quit,input,buttons[16];
+  Window w,quit,input,buttons[16],draw,clear;
   Window root;
   int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0;
   char formula[255],string[255];
@@ -34,9 +34,14 @@ int main(int argc,char **argv)
   XAllocNamedColor(dpy,cmap,"red",&c1[0],&c0[0]);
   XAllocNamedColor(dpy,cmap,"blue",&c1[1],&c0[1]);
 
+  
+  /*------------- Window Setting -------------------*/
+
   w = XCreateSimpleWindow(dpy, root, 100, 100, WIDTH, HIGHT, BORDER, black, white);
   quit = XCreateSimpleWindow(dpy,w,10,3,30,12,BORDER,black,white);
   input = XCreateSimpleWindow(dpy,w,510,10,260,480,BORDER,black,white);
+  draw = XCreateSimpleWindow(dpy,w,520,30,30,12,BORDER,black,white);
+  clear = XCreateSimpleWindow(dpy,w,560,30,30,12,BORDER,black,white);
   for(count = 0;count < 16;count++){
 	buttons[count] = XCreateSimpleWindow(dpy,w,550+tate*50,200+yoko*80,30,30,BORDER,black,white);
 	tate++;
