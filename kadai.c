@@ -59,12 +59,7 @@ int main(int argc,char **argv)
 	switch (e.type){
 	  case KeyPress:
 		printf("keycode=%d \n",e.xkey.keycode);
-		if(input && XLookupString(&e,string,9,&key,NULL) == 1){
-		  formula[0] = string[0];
-		  formula[1] = '\0';
-		  XDrawString(dpy,input,gc,4+l,10,formula,strlen(formula));
-		  l += 10;
-		}
+		
 		if(e.xkey.keycode == 24) return 0;
 		break;
 	  case ButtonPress :
@@ -73,6 +68,9 @@ int main(int argc,char **argv)
 		  printf("Exit!\n");
 		  return 0;
 		}
+
+		/*----------- Basic Drawing -------------*/
+		
 		XDrawString(dpy,quit,gc,4,10,"Exit",4);
 		XDrawString(dpy,w,gc,491,250,"X",1);
 		XDrawString(dpy,w,gc,250,8,"Y",1);
@@ -82,13 +80,12 @@ int main(int argc,char **argv)
 		for(count = 0;count < 16;count++){
 		  XDrawString(dpy,buttons[count],gc,13,20,&buttonString[count],1);
 	      tate++;
-		  printf("x:%d,y:%d\n",550+(tate*50)+15,200+(yoko*80)+15);
 	      if((count+1) % 4 == 0){
 	        yoko++;
 	  		tate = 0;
 		  }
-		  printf("Draw!\n");
 	    }
+	    /*-----------------------------------------*/
 		break;
 	}
   }
