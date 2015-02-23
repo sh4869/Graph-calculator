@@ -15,8 +15,8 @@ int main(int argc,char **argv)
 {
 	Display *dpy;
 	Window w,quit,input,buttons[16],draw,clear;
-    Window sinW,cosW,tanW;
-    Window graph_list;
+	Window sinW,cosW,tanW;
+	Window graph_list;
 	Window root;
 	int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0,equCount = 0,equFlag = 0,value,equLength;
 	float coef[10];
@@ -46,7 +46,7 @@ int main(int argc,char **argv)
 	white = WhitePixel (dpy, screen);
 	black = BlackPixel (dpy, screen);
 	cmap = DefaultColormap(dpy,0);
-	 for(count = 0;count < 9;count++)
+	for(count = 0;count < 9;count++)
 		XAllocNamedColor(dpy,cmap,&color_name[count][0],&c1[count],&c0[count]); 
 
 
@@ -57,10 +57,10 @@ int main(int argc,char **argv)
 	input = XCreateSimpleWindow(dpy,w,510,10,260,480,BORDER,black,white);
 	draw = XCreateSimpleWindow(dpy,w,520,30,40,20,BORDER,black,white);
 	clear = XCreateSimpleWindow(dpy,w,580,30,40,20,BORDER,black,white);
-    sinW = XCreateSimpleWindow(dpy,w,630,30,20,10,BORDER,black,white);
-    cosW = XCreateSimpleWindow(dpy,w,660,30,20,10,BORDER,black,white);
-    tanW = XCreateSimpleWindow(dpy,w,690,30,20,10,BORDER,black,white);
-    graph_list = XCreateSimpleWindow(dpy,w,800,10,170,480,BORDER,black,white);
+	sinW = XCreateSimpleWindow(dpy,w,630,30,20,10,BORDER,black,white);
+	cosW = XCreateSimpleWindow(dpy,w,660,30,20,10,BORDER,black,white);
+	tanW = XCreateSimpleWindow(dpy,w,690,30,20,10,BORDER,black,white);
+	graph_list = XCreateSimpleWindow(dpy,w,800,10,170,480,BORDER,black,white);
 	for(count = 0;count < 16;count++){
 		buttons[count] = XCreateSimpleWindow(dpy,w,550+tate*50,200+yoko*80,30,30,BORDER,black,white);
 		tate++;
@@ -78,9 +78,9 @@ int main(int argc,char **argv)
 	XSelectInput(dpy,input,ButtonPressMask);
 	XSelectInput(dpy,draw,ButtonPressMask);
 	XSelectInput(dpy,clear,ButtonPressMask);
-    XSelectInput(dpy,sinW,ButtonPressMask);
-    XSelectInput(dpy,cosW,ButtonPressMask);
-    XSelectInput(dpy,tanW,ButtonPressMask);
+	XSelectInput(dpy,sinW,ButtonPressMask);
+	XSelectInput(dpy,cosW,ButtonPressMask);
+	XSelectInput(dpy,tanW,ButtonPressMask);
 	for(count = 0;count < 16;count++){
 		XSelectInput(dpy,buttons[count],ButtonPressMask);
 	}
@@ -97,7 +97,7 @@ int main(int argc,char **argv)
 			case KeyPress:
 				printf("keycode=%d \n",e.xkey.keycode);
 				if(e.xkey.keycode == 24) return 0;
-				
+
 			case ButtonPress :
 				while(count < 16){
 					if(e.xany.window == buttons[count]){
@@ -127,37 +127,37 @@ int main(int argc,char **argv)
 				}
 				if(e.xany.window == sinW || e.xany.window == cosW || e.xany.window == tanW){
 					if(e.xany.window == sinW){
-	                	XSetForeground(dpy,gc,c1[colorCount].pixel);
+						XSetForeground(dpy,gc,c1[colorCount].pixel);
 						colorCount++;
 						graph_draw = 1;
-				        for(count = 0;count < 480;count++){
-	                        XDrawPoint(dpy,w,gc,(count+10),-50*sin((count-240)/50.0) + 250);
-	                    }
-	                    printf("Sin\n");
-	                    sprintf(graph_equ,"%d : Y = sin(x)",graph_number + 1);
-	                }else if(e.xany.window == cosW){
-	                	XSetForeground(dpy,gc,c1[colorCount].pixel);
+						for(count = 0;count < 480;count++){
+							XDrawPoint(dpy,w,gc,(count+10),-50*sin((count-240)/50.0) + 250);
+						}
+						printf("Sin\n");
+						sprintf(graph_equ,"%d : Y = sin(x)",graph_number + 1);
+					}else if(e.xany.window == cosW){
+						XSetForeground(dpy,gc,c1[colorCount].pixel);
 						colorCount++;
 						graph_draw = 1;
-				        for(count = 0;count < 480;count++){
-	                        XDrawPoint(dpy,w,gc,(count+10),-100*cos((count-240)/100.0) + 250);
-	                    }
-	                    sprintf(graph_equ,"%d : Y = cos(x)",graph_number + 1);
-	                }else if(e.xany.window == tanW){
-	                	XSetForeground(dpy,gc,c1[colorCount].pixel);
+						for(count = 0;count < 480;count++){
+							XDrawPoint(dpy,w,gc,(count+10),-100*cos((count-240)/100.0) + 250);
+						}
+						sprintf(graph_equ,"%d : Y = cos(x)",graph_number + 1);
+					}else if(e.xany.window == tanW){
+						XSetForeground(dpy,gc,c1[colorCount].pixel);
 						colorCount++;
 						graph_draw = 1;
-				        for(count = 0;count < 480;count++){
-	                        XDrawPoint(dpy,w,gc,(count+10),-100*tan((count-240)/100.0) + 250);
-	                    }  
-	                    sprintf(graph_equ,"%d : Y = tan(x)",graph_number + 1);
-	                }
+						for(count = 0;count < 480;count++){
+							XDrawPoint(dpy,w,gc,(count+10),-100*tan((count-240)/100.0) + 250);
+						}  
+						sprintf(graph_equ,"%d : Y = tan(x)",graph_number + 1);
+					}
 					XDrawString(dpy,graph_list,gc,10,(graph_number+1)*10,graph_equ,strlen(graph_equ));
 					graph_number++;
 				}
 
 				XSetForeground(dpy,gc,c1[8].pixel);
-				
+
 				if(e.xany.window == quit){ 
 					printf("Exit!\n");
 					return 0;
@@ -174,7 +174,7 @@ int main(int argc,char **argv)
 					memset(equ,'\0',equLength);
 				}
 				if(e.xany.window == draw || forceDraw == 1){
- 					XSetForeground(dpy,gc,c1[colorCount].pixel);
+					XSetForeground(dpy,gc,c1[colorCount].pixel);
 					colorCount++;
 					graph_draw = 1;
 					printf("Draw!\n");
@@ -197,14 +197,14 @@ int main(int argc,char **argv)
 							XClearWindow(dpy,input);
 							sprintf(text,"%fx",coef[coefCount]);
 							for(count = 0;count < 480;count++){
-		  						coefX = count + 10;
-		  						coefY = -((count-240) * coef[coefCount]) + 250;
-		  						XDrawPoint(dpy,w,gc,coefX,coefY);
-		  						coefX = coefY = 0;
-		  					}
-		  					forceDraw = mustOpe = 0;
-		  					sprintf(graph_equ,"%d : Y = %fx",graph_number + 1,coef[coefCount]);
-		  					for(count = 0;count < 10;count++) coef[count] = 0;
+								coefX = count + 10;
+								coefY = -((count-240) * coef[coefCount]) + 250;
+								XDrawPoint(dpy,w,gc,coefX,coefY);
+								coefX = coefY = 0;
+							}
+							forceDraw = mustOpe = 0;
+							sprintf(graph_equ,"%d : Y = %fx",graph_number + 1,coef[coefCount]);
+							for(count = 0;count < 10;count++) coef[count] = 0;
 							break;
 						default:
 							break;
@@ -221,16 +221,16 @@ int main(int argc,char **argv)
 					XDrawString(dpy,input,gc,160,140,text,strlen(text));
 				}
 
-			    XSetForeground(dpy,gc,c1[8].pixel);
-				
+				XSetForeground(dpy,gc,c1[8].pixel);
+
 				/*----------- Basic Drawing -------------*/
 
 				XDrawString(dpy,quit,gc,4,10,"Exit",4);
 				XDrawString(dpy,draw,gc,4,10,"Draw!",5);
 				XDrawString(dpy,clear,gc,4,10,"Clear!",6);
-                XDrawString(dpy,sinW,gc,2,8,"sin",3);
-                XDrawString(dpy,cosW,gc,2,8,"cos",3);
-                XDrawString(dpy,tanW,gc,2,8,"tan",3);
+				XDrawString(dpy,sinW,gc,2,8,"sin",3);
+				XDrawString(dpy,cosW,gc,2,8,"cos",3);
+				XDrawString(dpy,tanW,gc,2,8,"tan",3);
 				XDrawString(dpy,w,gc,491,250,"X",1);
 				XDrawString(dpy,w,gc,250,8,"Y",1);
 				XDrawString(dpy,input,gc,15,80,"Y =",3);
@@ -260,7 +260,7 @@ int main(int argc,char **argv)
 /*
    @opeFlag 0:計算しなくていい 1:計算する
    @ope   0: +   1: -   2: *   3: /      
-   										*/
+   */
 
 float cast(char *equ,int length){
 	int opeFlag = 0;
