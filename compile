@@ -1,2 +1,2 @@
-gcc kadai.c -o kadai.out -lX11 -std=c99
+gcc kadai.c -o kadai.out -lX11　-lm -std=c99
 
