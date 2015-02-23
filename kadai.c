@@ -7,7 +7,7 @@
 #include <math.h>
 
 #define BORDER 2
-#define WIDTH  800
+#define WIDTH  1000
 #define HIGHT 500
 
 float cast(char *equ,int length);
@@ -16,6 +16,7 @@ int main(int argc,char **argv)
 	Display *dpy;
 	Window w,quit,input,buttons[16],draw,clear;
     Window sinW,cosW,tanW;
+    Window graph_list;
 	Window root;
 	int    screen,xPoint,yPoint,l = 0,count = 0,yoko = 0,tate = 0,equCount = 0,equFlag = 0,value,equLength;
 	float coef[10];
@@ -23,6 +24,10 @@ int main(int argc,char **argv)
 	int mustOpe = 0,forceDraw = 0;
 	int colorCount = 0;
 	int coefX,coefY;
+	// For Graph List
+	int graph_number = 0,graph_draw = 0,graph_equ_length = 0;
+	char graph_equ[100];
+
 	char formula[255],string[255];
 	char buttonString[16] = {'1','2','3','+','4','5','6','-','7','8','9','*','0','x','=','/'};
 	char equ[255];
@@ -55,6 +60,7 @@ int main(int argc,char **argv)
     sinW = XCreateSimpleWindow(dpy,w,630,30,20,10,BORDER,black,white);
     cosW = XCreateSimpleWindow(dpy,w,660,30,20,10,BORDER,black,white);
     tanW = XCreateSimpleWindow(dpy,w,690,30,20,10,BORDER,black,white);
+    graph_list = XCreateSimpleWindow(dpy,w,800,10,170,480,BORDER,black,white);
 	for(count = 0;count < 16;count++){
 		buttons[count] = XCreateSimpleWindow(dpy,w,550+tate*50,200+yoko*80,30,30,BORDER,black,white);
 		tate++;
@@ -83,6 +89,7 @@ int main(int argc,char **argv)
 	count = 0;
 	XMapWindow(dpy, w);
 	XMapSubwindows(dpy,w);
+
 	while(1){
 		//Event
 		XNextEvent(dpy,&e);
@@ -90,39 +97,8 @@ int main(int argc,char **argv)
 			case KeyPress:
 				printf("keycode=%d \n",e.xkey.keycode);
 				if(e.xkey.keycode == 24) return 0;
-				if(e.xkey.keycode == 54){
-					printf("Clear!\n");
-					XClearWindow(dpy,w);
-					XClearWindow(dpy,input);
-					l = 0;
-					equCount = 0;
-					equLength = strlen(equ);
-					memset(equ,'\0',equLength);
-				    XDrawString(dpy,w,gc,491,250,"X",1);
-					XDrawString(dpy,w,gc,250,8,"Y",1);
-				    XDrawString(dpy,input,gc,15,80,"Y =",3);
-					XDrawString(dpy,input,gc,70,140,"Last Answer:",12);
-					XDrawLine(dpy,w,gc,10,250,490,250);
-					XDrawLine(dpy,w,gc,250,10,250,490);
-				}
-				break;
-
+				
 			case ButtonPress :
-				printf("x=%d y=%d button=%d \n",e.xbutton.x,e.xbutton.y,e.xbutton.button);
-                if(e.xany.window == sinW){
-			        for(count = 0;count < 480;count++){
-                        XDrawPoint(dpy,w,gc,(count+10),-50*sin((count-240)/50.0) + 250);
-                    }
-                    printf("Sin\n");
-                }else if(e.xany.window == cosW){
-			        for(count = 0;count < 480;count++){
-                        XDrawPoint(dpy,w,gc,(count+10),-100*cos((count-240)/100.0) + 250);
-                    }
-                }else if(e.xany.window == tanW){
-			        for(count = 0;count < 480;count++){
-                        XDrawPoint(dpy,w,gc,(count+10),-100*tan((count-240)/100.0) + 250);
-                    }  
-                }
 				while(count < 16){
 					if(e.xany.window == buttons[count]){
 						if(mustOpe == 1 && (count+1) % 4 != 0){
@@ -143,11 +119,45 @@ int main(int argc,char **argv)
 							coef[coefCount] = cast(equ,strlen(equ));
 							equFlag = 2;
 							forceDraw = 1;
+						}else if(count == 14){
+							forceDraw = 1;
 						}
 					}
 					count++;
 				}
+				if(e.xany.window == sinW || e.xany.window == cosW || e.xany.window == tanW){
+					if(e.xany.window == sinW){
+	                	XSetForeground(dpy,gc,c1[colorCount].pixel);
+						colorCount++;
+						graph_draw = 1;
+				        for(count = 0;count < 480;count++){
+	                        XDrawPoint(dpy,w,gc,(count+10),-50*sin((count-240)/50.0) + 250);
+	                    }
+	                    printf("Sin\n");
+	                    sprintf(graph_equ,"%d : Y = sin(x)",graph_number + 1);
+	                }else if(e.xany.window == cosW){
+	                	XSetForeground(dpy,gc,c1[colorCount].pixel);
+						colorCount++;
+						graph_draw = 1;
+				        for(count = 0;count < 480;count++){
+	                        XDrawPoint(dpy,w,gc,(count+10),-100*cos((count-240)/100.0) + 250);
+	                    }
+	                    sprintf(graph_equ,"%d : Y = cos(x)",graph_number + 1);
+	                }else if(e.xany.window == tanW){
+	                	XSetForeground(dpy,gc,c1[colorCount].pixel);
+						colorCount++;
+						graph_draw = 1;
+				        for(count = 0;count < 480;count++){
+	                        XDrawPoint(dpy,w,gc,(count+10),-100*tan((count-240)/100.0) + 250);
+	                    }  
+	                    sprintf(graph_equ,"%d : Y = tan(x)",graph_number + 1);
+	                }
+					XDrawString(dpy,graph_list,gc,10,(graph_number+1)*10,graph_equ,strlen(graph_equ));
+					graph_number++;
+				}
 
+				XSetForeground(dpy,gc,c1[8].pixel);
+				
 				if(e.xany.window == quit){ 
 					printf("Exit!\n");
 					return 0;
@@ -156,6 +166,8 @@ int main(int argc,char **argv)
 					printf("Clear!\n");
 					XClearWindow(dpy,w);
 					XClearWindow(dpy,input);
+					XClearWindow(dpy,graph_list);
+					graph_number = 0;
 					l = 0;
 					equCount = 0;
 					equLength = strlen(equ);
@@ -164,7 +176,7 @@ int main(int argc,char **argv)
 				if(e.xany.window == draw || forceDraw == 1){
  					XSetForeground(dpy,gc,c1[colorCount].pixel);
 					colorCount++;
-					if(colorCount == 8) colorCount = 0; 
+					graph_draw = 1;
 					printf("Draw!\n");
 					switch(equFlag){
 						case 0:
@@ -172,12 +184,14 @@ int main(int argc,char **argv)
 							XClearWindow(dpy,input);
 							sprintf(text,"%d",value);
 							XDrawLine(dpy,w,gc,10,250-value,490,250-value);
+							sprintf(graph_equ,"%d : Y = %d",graph_number + 1,value);
 							break;
 						case 1:
 							value = cast(equ,strlen(equ));
 							XClearWindow(dpy,input);	
 							sprintf(text,"%d",value);
 							XDrawLine(dpy,w,gc,10,250-value,490,250-value);
+							sprintf(graph_equ,"%d : Y = %d",graph_number + 1,value);
 							break;
 						case 2:
 							XClearWindow(dpy,input);
@@ -189,6 +203,7 @@ int main(int argc,char **argv)
 		  						coefX = coefY = 0;
 		  					}
 		  					forceDraw = mustOpe = 0;
+		  					sprintf(graph_equ,"%d : Y = %fx",graph_number + 1,coef[coefCount]);
 		  					for(count = 0;count < 10;count++) coef[count] = 0;
 							break;
 						default:
@@ -197,10 +212,17 @@ int main(int argc,char **argv)
 					equFlag = l = equCount = mustOpe = 0;
 					equLength = strlen(equ);
 					memset(equ,'\0',equLength);
+
+					if(graph_draw){
+						XDrawString(dpy,graph_list,gc,10,(graph_number+1)*10,graph_equ,strlen(graph_equ));
+						graph_number++;
+					}
 					XSetForeground(dpy,gc,c1[8].pixel);
 					XDrawString(dpy,input,gc,160,140,text,strlen(text));
 				}
 
+			    XSetForeground(dpy,gc,c1[8].pixel);
+				
 				/*----------- Basic Drawing -------------*/
 
 				XDrawString(dpy,quit,gc,4,10,"Exit",4);
@@ -216,6 +238,10 @@ int main(int argc,char **argv)
 				XDrawLine(dpy,w,gc,10,250,490,250);
 				XDrawLine(dpy,w,gc,250,10,250,490);
 				tate = yoko = 0;
+				graph_draw = 0;
+				graph_equ_length = strlen(graph_equ);
+				memset(graph_equ,"\0",graph_equ_length);
+				if(colorCount == 8) colorCount = 0; 
 				for(count = 0;count < 16;count++){
 					XDrawString(dpy,buttons[count],gc,13,20,&buttonString[count],1);
 					tate++;
@@ -238,7 +264,7 @@ int main(int argc,char **argv)
 
 float cast(char *equ,int length){
 	int opeFlag = 0;
-	int count = 0,valueCharCount = 0,valuesCount = 0,ope = 0,oldOpe = 0;
+	int count = 0,valueCharCount = 0,valuesCount = 0,ope = 0,oldOpe = 0,minus_first = 0;
 	float result = 0;
 	int values[10];
 	char valuesChar[10];
@@ -257,6 +283,9 @@ float cast(char *equ,int length){
 				opeFlag = 1;
 				break;
 			case '-':
+				if(count == 0){
+					minus_first = 1;
+				}
 				values[valuesCount] = atoi(valuesChar);
 				memset(valuesChar,'\0',valueCharCount);
 				if(valueCharCount != 0){
@@ -302,7 +331,11 @@ float cast(char *equ,int length){
 		}
 		if(opeFlag || count == length){
 			if(valuesCount == 1){
-				result = values[valuesCount - 1];
+				if(minus_first){
+					result -= values[valuesCount - 1];
+				}else{
+					result = values[valuesCount - 1];
+				}
 			}else if(valuesCount != 0){
 				switch(oldOpe){
 					case 0:
